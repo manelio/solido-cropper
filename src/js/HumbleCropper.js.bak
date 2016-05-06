@@ -1,0 +1,506 @@
+//import $ from './uDOM';
+import $ from 'jquery';
+require('jquery-ui/resizable');
+
+window.jQuery = $;
+
+function isElement(obj) {
+  try {
+    //Using W3 DOM2 (works for FF, Opera and Chrom)
+    return obj instanceof HTMLElement;
+  }
+  catch(e){
+    //Browsers not supporting W3 DOM2 don't have HTMLElement and
+    //an exception is thrown and we end up here. Testing some
+    //properties that all elements have. (works on IE7)
+    return (typeof obj==="object") &&
+      (obj.nodeType===1) && (typeof obj.style === "object") &&
+      (typeof obj.ownerDocument ==="object");
+  }
+}
+
+export default class HumbleCropper {
+
+
+
+  constructor(options) {
+
+
+function getPageX(e) {
+    if (e.originalEvent.touches) {
+        return e.originalEvent.touches[0].pageX;
+    } else {
+        return e.pageX;
+    }
+}
+
+function getPageY(e) {
+    if (e.originalEvent.touches) {
+        return e.originalEvent.touches[0].pageY;
+    } else {
+        return e.pageY;
+    }
+}
+
+
+
+
+    if (isElement(options)) {
+      if (options.tagName === 'IMG') {
+        this.image = options;
+      }
+    }
+
+    let template = 
+`
+<div class="solido-image-editor">
+  <canvas id="solido-image-editor-canvas">
+  </canvas>
+
+  <div class="viewport">
+  </div>
+
+  <div class="__humblecropper-overlay">
+  </div>
+</div>
+`;
+    this.el = document.createElement('div');
+    $(this.el).addClass('__humblecropper-container').html(template);
+
+    $(this.image).hide().before(this.el);
+
+    this.viewport = $('.viewport', this.el);
+    var viewport = this.viewport.get(0);
+    var Vx, Vy, Vw, Vh;
+
+    function viewportResized() {
+      var el = viewport;
+
+      Vw = el.offsetWidth;
+      Vh = el.offsetHeight;
+
+      Vx = el.offsetLeft - Vw/2 - 1;
+      Vy = el.offsetTop - Vh/2;
+  }
+  viewportResized();
+
+
+
+$('.viewport').on('mousedown mousewheel touchstart', function(e) {
+    if (e.target.className.indexOf('ui-resizable-handle') > -1) return true;
+    $(canvas).trigger(e);
+});
+
+$('.viewport').on('DOMMouseScroll mousewheel', function(e) {
+    if (e.target.className.indexOf('ui-resizable-handle') > -1) return true;
+    
+    var e2 = jQuery.Event( "DOMMouseScroll",{delta: -650} );
+    $(canvas).trigger(e2);
+});
+
+
+$('.viewport').resizable({
+    resize: function(event, ui) {
+        var newWidth = ui.originalSize.width + ((ui.size.width - ui.originalSize.width)*2);
+        var newHeight = ui.originalSize.height +((ui.size.height - ui.originalSize.height)*2);
+        $(this)
+        .width(newWidth)
+        .height(newHeight)
+        .position({
+            of: $(".solido-image-editor"),
+            my: "center center",
+            at: "center center"
+        });
+
+        viewportResized();
+        redraw();
+    }
+}).on('contextmenu', function() {
+    return false;
+});
+
+
+
+
+    
+    var $canvas = $('canvas', this.el);
+    this.canvas = $canvas[0];
+
+    function resizeCanvas() {
+      var width = $canvas.width();
+      var height = $canvas.height();
+
+      $canvas.attr({
+          width: width,
+          height: height
+      });
+
+      redraw();
+    }
+
+    resizeCanvas();
+
+    $(window).resize(function() {
+      resizeCanvas();
+    });
+
+    var canvas = $canvas[0];
+
+    var ctx = canvas.getContext('2d');
+    var porigin = {x: 300, y: 100};
+    var rot = 0;
+    var scale = .3;
+
+    function redraw_transform()
+    {
+        ctx.translate(porigin.x, porigin.y);
+        ctx.rotate(rot);
+        ctx.scale(scale, scale);
+    }
+
+
+
+
+var dirty = false;
+function redraw() {
+    dirty = true;
+    requestAnimationFrame(render);
+}
+
+function render(timestamp, force) {
+    if (dirty || force) {
+
+        ctx.save();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
+        ctx.save();
+        redraw_transform();
+        ctx.drawImage(img, 0, 0, Iw, Ih);
+
+        ctx.restore();
+
+        /*
+        ctx.beginPath();
+        ctx.rect(Vx, Vy, Vw, Vh);
+        ctx.closePath();
+        ctx.clip();
+        */
+
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.beginPath();
+        ctx.rect(0, 0, Iw, Ih);
+        ctx.rect(Vx + Vw, Vy, -Vw, Vh);
+        ctx.closePath();
+        ctx.fill("evenodd");
+
+        //ctx.beginPath();
+        //ctx.arc(300,125,50, 0, 2 * Math.PI, false);
+        // Don't stroke or fill it
+        
+        // Now clip() the canvas
+        //ctx.clip();
+        //ctx.globalCompositeOperation = 'destination-out';
+
+        /*
+        ctx.beginPath();
+        ctx.rect(10, 10, 200, 200);
+        ctx.clip();
+        */
+
+
+        ctx.restore();
+
+        dirty = false;
+    }
+}
+
+//requestAnimationFrame(render);
+
+
+
+var img = this.image;
+var el = this.el;
+
+var Iw, Ih;
+
+function imgLoaded() {
+    Iw = this.naturalWidth;
+    Ih = this.naturalHeight;
+    render(0, true);
+
+    $('.__humblecropper-overlay').one('ransitionend webkitTransitionEnd oTransitionEnd otransitionend MSTransitionEnd',
+    function(e) {
+        $(this).remove();
+    });
+
+    $(el).addClass('loaded');
+
+    initialize();
+}
+
+
+function initialize() {
+    var Iw = this.img.naturalWidth;
+    var Ih = this.img.naturalHeight;
+
+    var Cw = this.canvas.offsetWidth;
+    var Ch = this.canvas.offsetHeight;
+
+    console.log('init');
+    
+    console.log(Iw);
+    console.log(Ih);
+    console.log(Cw);
+    console.log(Ch);
+}
+
+if (img.complete) imgLoaded.bind(img)();
+else img.onload = imgLoaded;
+
+var lastX=canvas.width/2, lastY=canvas.height/2;
+
+function mousemovePan(e) {
+    //lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+    //lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
+    dragged = true;
+    if (p0) {
+        var delta = {
+            dx: getPageX(e) - p0.x,
+            dy: getPageY(e) - p0.y
+        }
+        
+        //var pt = ctx.transformedPoint(lastX,lastY);
+        //ctx.translate(pt.x-dragStart.x,pt.y-dragStart.y);
+
+        porigin.x = porigin0.x + delta.dx;
+        porigin.y = porigin0.y + delta.dy;
+
+        //console.log(porigin);
+
+        redraw();
+    }
+}
+
+
+function mousemoveRotate(e) {
+    dragged = true;
+
+    if (!p0) return;
+
+    var delta = {
+        dx: getPageX(e) - p0.x,
+        dy: getPageY(e) - p0.y
+    }
+    
+    var ox =  anchor.x - porigin0.x;
+    var oy =  anchor.y - porigin0.y;
+    var ang = delta.dy / 100;
+
+    var sin = Math.sin(ang);
+    var cos = Math.cos(ang);
+    
+    porigin.x = porigin0.x - (ox * cos - oy * sin) + ox;
+    porigin.y = porigin0.y - (ox * sin + oy * cos) + oy;
+
+    rot = rot0 + ang;
+
+    redraw();
+    
+}
+
+function doZoom(factor) {
+  scale = scale0 * (1 - factor);
+
+  porigin.x = porigin0.x + (anchor.x - porigin0.x) * factor;
+  porigin.y = porigin0.y + (anchor.y - porigin0.y) * factor;
+}
+
+function mousemoveZoom(e) {
+    dragged = true;
+    if (p0) {
+        var delta = {
+            dx: getPageX(e) - p0.x,
+            dy: getPageY(e) - p0.y
+        }
+        
+        //var pt = ctx.transformedPoint(lastX,lastY);
+        //ctx.translate(pt.x-dragStart.x,pt.y-dragStart.y);
+
+        var factor = delta.dy / 600.0;
+
+        scale = scale0 * (1 - factor);
+
+        porigin.x = porigin0.x + (anchor.x - porigin0.x) * factor;
+        porigin.y = porigin0.y + (anchor.y - porigin0.y) * factor;
+
+        redraw();
+    }
+}
+
+
+
+var p0, rot0, scale0, porigin0, dragStart, dragged;
+var anchor = {};
+
+$(canvas).on('contextmenu click', function(e) {
+    return false;
+});
+
+var scrollPixels = 0; // variable to store scroll delta
+var scrolling; // timeout function var
+
+
+$(canvas).on('mousewheel', function(e) {
+  
+    var oe = e.originalEvent;
+    var delta = oe.wheelDelta ? oe.wheelDelta/40 : oe.detail ? -oe.detail : 0;
+
+    var doc = document.documentElement;
+    var left = (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0);
+    var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+
+    var canvasOffset = canvas.getBoundingClientRect();
+    var pageX = getPageX(e), pageY = getPageY(e);
+    
+    anchor.x = pageX - canvasOffset.left - left;
+    anchor.y = pageY - canvasOffset.top - top;
+
+    p0 = {x: pageX, y: pageY};
+    porigin0  = {
+        x: porigin.x,
+        y: porigin.y
+    };
+    rot0 = rot;
+    scale0 = scale;
+    
+    dragged = false;
+
+    doZoom(-delta/40);
+
+    redraw();
+});
+
+
+var keymap = {};
+
+$(document).on('keydown', function(e) {
+  if (keymap[e.keyCode]) return true;
+  keymap[e.keyCode] = true;
+  
+})
+.on('keyup', function(e) {
+  keymap[e.keyCode] = false;
+});
+
+
+$(canvas).on('mousedown touchstart', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
+
+    //anchor.x = e.offsetX || (e.pageX - canvas.offsetLeft);
+    //anchor.y = e.offsetY || (e.pageY - canvas.offsetTop);
+
+var doc = document.documentElement;
+var left = (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0);
+var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+
+    
+    //console.log('scroll: ' + left + ', ' + top);
+    var canvasOffset = canvas.getBoundingClientRect();
+    var pageX = getPageX(e), pageY = getPageY(e);
+    
+    anchor.x = pageX - canvasOffset.left - left;
+    anchor.y = pageY - canvasOffset.top - top;
+
+    //console.log('anchor: ' + anchor.x + ', ' + anchor.y);
+    //console.log('anchoraux: ' + (pageX - canvas.offsetLeft) + ', ' + (pageY - canvas.offsetTop));
+
+    p0 = {x: pageX, y: pageY};
+    porigin0  = {
+        x: porigin.x,
+        y: porigin.y
+    };
+    rot0 = rot;
+    scale0 = scale;
+    
+    dragged = false;
+
+    var handler;
+
+    //console.log(e.which);
+
+    if (!e.which || e.which == 1) {
+        $('.solido-image-editor').addClass('action-pan');
+        handler = mousemovePan;
+    } else if (e.which == 2) {
+        $('.solido-image-editor').addClass('action-rotate');
+        handler = mousemoveRotate;
+    } else {
+        $('.solido-image-editor').addClass('action-zoom');
+        handler = mousemoveZoom;
+    }
+
+    $(document).on('mousemove.solido touchmove.solido', handler);
+
+    $(document).on('mouseup.solido touchend.solido', function(evt) {
+
+        $('.solido-image-editor').removeClass('action-pan action-zoom action-rotate');
+
+        //console.log('WW remove event handlers');
+
+        $(document).off('.solido');
+        dragStart = null;
+        //if (!dragged) zoom(evt.shiftKey ? -1 : 1 );
+    });
+    
+    //canvas.addEventListener('DOMMouseScroll', handleScroll, false);
+    //canvas.addEventListener('mousewheel', handleScroll, false);
+
+    return false;
+});
+
+
+
+
+(function() {
+    var lastTime = 0;
+    var vendors = ['ms', 'moz', 'webkit', 'o'];
+    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+        window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
+                                   || window[vendors[x]+'CancelRequestAnimationFrame'];
+    }
+ 
+    if (!window.requestAnimationFrame)
+        window.requestAnimationFrame = function(callback, element) {
+            var currTime = new Date().getTime();
+            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+            var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
+              timeToCall);
+            lastTime = currTime + timeToCall;
+            return id;
+        };
+ 
+    if (!window.cancelAnimationFrame)
+        window.cancelAnimationFrame = function(id) {
+            clearTimeout(id);
+        };
+}());
+
+
+
+    /*
+    this.options = Object.assign({
+      fixed: true
+    }, options);
+
+    console.log(this.options);
+    */
+  }
+
+
+}

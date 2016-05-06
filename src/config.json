@@ -1,0 +1,15 @@
+{
+  "context": "src",
+  "entry": {
+    "humblecropper": [
+      "./js/index.js",
+      "./styles/main.scss"
+    ]
+  },
+  "output": {
+    "path": "dist",
+    "publicPath": "/dist/"
+  },
+  "devUrl": "http://192.168.1.2",
+  "devPort": 3000
+}

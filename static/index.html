@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../dist/styles/humblecropper.css" />
+    <link rel="stylesheet" href="example.css" />    
+</head>
+
+<body>
+<div class="example1">
+    <!--
+    <div class="devel-info">    
+        <div class="devel-info-details">
+            pan: left click + drag, zoom: wheel or right click + drag, rotate: middle click + drag.
+        </div>
+    </div>
+    -->
+    <img style="display: none" src="big-image.jpg" />
+</div>
+
+<script src="../dist/js/humblecropper.js"></script>
+<!--
+<script src="jquery.ui.touch-punch.min.js"></script>
+-->
+
+<script>
+;(function() {
+
+  var image = document.querySelector('.example1 img');
+  var cropper = new HumbleCropper(image);
+
+})();
+</script>
+
+</body>
+</html>

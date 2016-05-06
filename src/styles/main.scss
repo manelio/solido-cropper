@@ -1,0 +1,88 @@
+@mixin full-absolute() {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.__humblecropper-container {
+    
+    @include full-absolute();
+
+    canvas {
+        /*background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAAA3NCSVQICAjb4U/gAAAABlBMVEXMzMz////TjRV2AAAACXBIWXMAAArrAAAK6wGCiw1aAAAAHHRFWHRTb2Z0d2FyZQBBZG9iZSBGaXJld29ya3MgQ1M26LyyjAAAABFJREFUCJlj+M/AgBVhF/0PAH6/D/HkDxOGAAAAAElFTkSuQmCC");*/
+        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYlWNgYGCQwoKxgqGgcJA5h3yFAAs8BRWVSwooAAAAAElFTkSuQmCC");
+        @include full-absolute();
+    }
+
+    .__humblecropper-overlay {
+        @include full-absolute();
+        background: #fff;
+        z-index: 9999;
+        opacity: 1;
+    }
+
+    .__humblecropper-overlay {
+
+        transition: opacity .75s ease-in;
+
+        @include full-absolute();
+        background: #fff;
+        z-index: 9999;
+        opacity: 1;
+    }
+}
+
+.__humblecropper-container.loaded {
+    .__humblecropper-overlay {
+        opacity: 0;
+    }
+}
+
+.viewport-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    /*background-color: #000;
+    opacity: .5;*/
+}
+
+.viewport {
+
+    position: absolute;
+    width: 300px;
+    height: 300px;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    z-index: 999;
+
+    /*background: #fff;
+    opacity: 0.1;*/
+
+    border: 2px solid #000;
+
+    /*
+    .viewport-inner {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+    }
+    */
+}
+
+@import '~jquery-ui/themes/ui-lightness/jquery-ui.css';
