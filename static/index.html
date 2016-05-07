@@ -7,15 +7,15 @@
 </head>
 
 <body>
-<div class="example1">
-    <!--
-    <div class="devel-info">    
+<div class="example1">    
+    
+    <div class="devel-info">
         <div class="devel-info-details">
-            pan: left click + drag, zoom: wheel or right click + drag, rotate: middle click + drag.
+            pan: left click + drag, zoom: wheel or right click + drag, rotate: middle click + drag. <a href="#" id="test1">test1</a>
         </div>
     </div>
-    -->
-    <img style="display: none" src="big-image.jpg" />
+    
+    <img style="display: none" src="test-image.jpg" />
 </div>
 
 <script src="../dist/js/humblecropper.js"></script>
@@ -28,6 +28,16 @@
 
   var image = document.querySelector('.example1 img');
   var cropper = new HumbleCropper(image);
+
+    var test1 = document.getElementById('test1');
+    test1.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        cropper.random();
+
+        return false;
+    });
 
 })();
 </script>
