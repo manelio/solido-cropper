@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../dist/styles/humblecropper.css" />
-    <link rel="stylesheet" href="example.css" />    
+    <link rel="stylesheet" href="example.css" />
 </head>
 
 <body>
@@ -11,11 +11,18 @@
     
     <div class="devel-info">
         <div class="devel-info-details">
-            pan: left click + drag, zoom: wheel or right click + drag, rotate: middle click + drag. <a href="#" id="test1">test1</a>
+            pan: left click + drag, zoom: wheel or right click + drag, rotate: middle click + drag.
+            <a href="#" id="test1">test1</a>
+            <a href="javascript:void(0)" onclick="cropper.fith()">fith</a>
+            <a href="javascript:void(0)" onclick="cropper.fitw()">fitw</a>
         </div>
     </div>
     
+    <!-- <img style="display: none" src="gradient10000.jpg" /> -->
+    <!-- <img style="display: none" src="big-image.jpg" /> -->
+    <!-- <img style="display: none" src="huge-image.jpg" /> -->
     <img style="display: none" src="test-image.jpg" />
+    <!-- <img style="display: none" src="500px.jpg" /> -->
 </div>
 
 <script src="../dist/js/humblecropper.js"></script>
@@ -27,7 +34,7 @@
 ;(function() {
 
   var image = document.querySelector('.example1 img');
-  var cropper = new HumbleCropper(image);
+  window.cropper = new HumbleCropper(image);
 
     var test1 = document.getElementById('test1');
     test1.addEventListener('click', function(e) {

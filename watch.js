@@ -15,8 +15,6 @@ var host = 'http://192.168.1.2',
 
 webpackConfig.output.publicPath = host + ':' + port + config.output.publicPath;
 
-console.log('webpackConfig.output.publicPath: ' + webpackConfig.output.publicPath);
-
 compiler = webpack(webpackConfig);
 
 browserSync.init({

@@ -1,9 +1,7 @@
 // Adapted from Transform class by Simon Sarris
-// www.simonsarris.com
-// sarris@acm.org
 // https://github.com/simonsarris/Canvas-tutorials/blob/master/transform.js
 
-export default class TransformationMatrix {
+export default class TransformationMatrix2D {
   
   constructor(m) {
     if (m) this.m = m;
@@ -28,6 +26,20 @@ export default class TransformationMatrix {
     ;
     this.m = [a, b, c, d, e, f];
     return this;
+  }
+
+  inverse() {
+    let m = this.m;
+    let
+      k = 1 / (m[0] * m[3] - m[1] * m[2]),
+      a = m[3] * k,
+      b = -m[1] * k,
+      c = -m[2] * k,
+      d = m[0] * k,
+      e = k * (m[2] * m[5] - m[3] * m[4]),
+      f = k * (m[1] * m[4] - m[0] * m[5])
+    ;
+    return new  TransformationMatrix2D([a, b, c, d, e, f]);    
   }
 
   multiply(m2) {
@@ -83,6 +95,10 @@ export default class TransformationMatrix {
     return this;
   };
 
+  getScaleX() {
+    return Math.sqrt(this.m[0] * this.m[0] + this.m[1] * this.m[1]);
+  }
+
   transformPoint(px, py) {
     let
       m = this.m,
@@ -112,5 +128,3 @@ export default class TransformationMatrix {
   }
 
 }
-
-export default TransformationMatrix;

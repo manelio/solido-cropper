@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+
+        #playground {
+            background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYlWNgYGCQwoKxgqGgcJA5h3yFAAs8BRWVSwooAAAAAElFTkSuQmCC");
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #fps {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            padding: 5px;
+            background: rgba(0, 0, 0, .75);
+            color: #fff;
+        }
+
+        #form {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            padding: 5px;
+            background: #fff;
+        }
+
+        #form form {
+            margin: -5px 0;
+        }
+
+        #form input {
+            display: block;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+<div class="example1">
+    <canvas id="playground">
+    </canvas>
+</div>
+
+<div id="fps"></div>
+
+<div id="form">
+<form>
+<label>Main Scale</label>
+<input id="main-scale" placeholder="Main Scale" />
+<label>Source Scale</label>
+<input id="source-scale" placeholder="Source Scale" value="1"/>
+<input type="button" value="Apply" />
+</form>
+</div>
+
+
+<script   src="https://code.jquery.com/jquery-2.2.3.min.js"   integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="   crossorigin="anonymous"></script>
+
+<script>
+;(function($) {
+
+var $canvas, canvas, context;
+var offcanvas, offcanvasContext;
+var rotation = 0;
+var scale = 1;
+var image = new Image();
+var w, h, side;
+var source;
+
+$(document).ready(function() {
+    $(image).on('load', run).attr('src', 'gradient10000.jpg');
+});
+
+var t0 = Date.now();
+
+function render() {
+
+    var t = Date.now();
+    var delta = (t - t0) / 1000;
+    var fps = 1/delta;
+
+    t0 = t;
+
+    $('#fps').html(Math.floor(fps));
+
+    rotation = rotation + .01;
+
+    context.save();
+    context.clearRect(0, 0, w, h);
+    
+    context.translate(w/2, h/2);
+    context.translate(-side/2, -side/2);
+
+    context.translate(side/2, side/2);
+    context.rotate(rotation);
+    context.translate(-side/2, -side/2);
+    context.scale(scale, scale);
+
+    context.scale(1/source.scale, 1/source.scale);
+    context.drawImage(source.origin, 0, 0, source.w, source.h, 0, 0, source.w, source.h);
+    context.scale(source.scale, source.scale);
+
+    context.restore();
+    requestAnimationFrame(render);
+}
+
+function refreshSize() {
+    w = $canvas.width();
+    h = $canvas.height();
+    $canvas.attr('width', w);
+    $canvas.attr('height', h);
+
+    var kw = w / image.naturalWidth;
+    var kh = h / image.naturalHeight;
+    var k = kw < kh?kw:kh;
+
+    scale = k * .8;
+
+    $('#main-scale').val(scale);
+
+    //scale = 1;
+
+    side = image.naturalWidth * scale;
+}
+
+function changeScales(mainScale, sourceScale) {
+    scale = mainScale;
+
+    scaledWidth = Math.ceil(image.naturalWidth * sourceScale);
+    scaledHeight = Math.ceil(image.naturalHeight * sourceScale);
+
+    //offcanvas = $('<canvas>').get(0);
+    //offcanvasContext = offcanvas.getContext('2d');
+
+    $(offcanvas).attr('width', scaledWidth);
+    $(offcanvas).attr('height', scaledHeight);
+
+    offcanvasContext.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, scaledWidth, scaledHeight);
+
+    source = {
+        origin: offcanvas,
+        w: scaledWidth,
+        h: scaledHeight,
+        scale: sourceScale
+    }
+
+    console.log(source);
+
+    side = image.naturalWidth * mainScale;
+
+}
+
+function run() {
+
+    $canvas = $('#playground');
+    refreshSize();
+    canvas = $canvas.get(0);
+    context = canvas.getContext('2d');
+
+    offcanvas = $('<canvas>').get(0);
+    offcanvasContext = offcanvas.getContext('2d');
+
+    source = {
+        origin: image,
+        w: image.naturalWidth,
+        h: image.naturalHeight,
+        scale: 1
+    }
+
+    requestAnimationFrame(render);
+}
+
+$('#main-scale').focus();
+
+$('#form input').on('change', function() {
+    var mainScale = $('#main-scale').val();
+    var sourceScale = $('#source-scale').val();
+
+    changeScales(mainScale, sourceScale);
+    return false;
+});
+
+$(window).resize(refreshSize);
+
+})(jQuery);
+</script>
+
+</body>
+</html>

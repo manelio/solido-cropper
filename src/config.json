@@ -10,6 +10,6 @@
     "path": "dist",
     "publicPath": "/dist/"
   },
-  "devUrl": "http://192.168.1.2",
+  "devUrl": "http://192.168.1.2/static/",
   "devPort": 3000
 }

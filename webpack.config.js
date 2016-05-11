@@ -22,8 +22,19 @@ var scriptsFilename = (argv.release) ? 'js/[name]_[hash].js' : 'js/[name].js',
 jsLoader = {
   test: /\.jsx?$/,
   exclude: /(node_modules|bower_components)/,
-  loaders: [ 'babel?presets[]=es2015&presets[]=stage-0&presets[]=react&cacheDirectory&plugins[]=add-module-exports&plugins[]=transform-es2015-modules-umd' ]
-};
+  loaders: [
+    'es3ify',
+    'babel?' + JSON.stringify({
+      presets: ['es2015', 'stage-0'],
+      plugins: [
+        ["add-module-exports"],
+        ['transform-es2015-modules-commonjs', { "loose": true }],
+        ['transform-es3-property-literals', {}],
+        ['transform-es3-member-expression-literals', {}]
+      ]
+    })
+  ]
+}
 
 if (argv.watch) { // '--watch' to add monkey-hot
   jsLoader.loaders.unshift('monkey-hot');
