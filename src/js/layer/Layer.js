@@ -1,8 +1,10 @@
 import TransformationMatrix2D from '../TransformationMatrix2D';
 
-export default class Canvas {
+export default class Layer {
 
   constructor() {
+    this.dirty = false;
+
     this.items = [];
     this.elMap = {};
 
@@ -10,11 +12,13 @@ export default class Canvas {
   }
 
   setSize(w, h) {
-
+    this.dirty = true;
   }
 
   addItem(item) {
+    item.layer = this;
     this.items.push(item);
+    this.dirty = true;
   }
 
 }

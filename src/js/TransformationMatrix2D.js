@@ -39,7 +39,7 @@ export default class TransformationMatrix2D {
       e = k * (m[2] * m[5] - m[3] * m[4]),
       f = k * (m[1] * m[4] - m[0] * m[5])
     ;
-    return new  TransformationMatrix2D([a, b, c, d, e, f]);    
+    return new TransformationMatrix2D([a, b, c, d, e, f]);
   }
 
   multiply(m2) {

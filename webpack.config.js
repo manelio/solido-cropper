@@ -27,10 +27,10 @@ jsLoader = {
     'babel?' + JSON.stringify({
       presets: ['es2015', 'stage-0'],
       plugins: [
-        ["add-module-exports"],
-        ['transform-es2015-modules-commonjs', { "loose": true }],
-        ['transform-es3-property-literals', {}],
-        ['transform-es3-member-expression-literals', {}]
+        ["add-module-exports"]
+        //['transform-es2015-modules-commonjs', { "loose": true }],
+        //['transform-es3-property-literals', {}],
+        //['transform-es3-member-expression-literals', {}]
       ]
     })
   ]

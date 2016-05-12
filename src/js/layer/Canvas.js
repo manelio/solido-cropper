@@ -43,10 +43,38 @@ export default class Canvas extends Layer {
     //context.drawImage(this.dom.image, 500, 500, 300, 300, 0, 0, 300, 300);
     
     context.restore();
+
+    this.dirty = false;
   }
 
   renderItem(item) {
-    this.context.drawImage(item.el, 0, 0, item.originalWidth, item.originalHeight);
+
+    let context = this.context;
+
+    switch(item.code) {
+      case 'image':
+        context.drawImage(item.el, 0, 0, item.originalWidth, item.originalHeight);
+      break;
+
+      case 'rectangle':
+        context.strokeStyle = "rgba(0, 0, 255, .75)";
+        context.lineWidth = 2;
+        context.strokeRect(item.x, item.y, item.w, item.h);
+      break;
+
+      case 'hole':
+        context.fillStyle = "rgba(255, 255, 255, .75)";
+        //context.fillStyle = "rgba(0, 0, 0, .75)";
+        context.beginPath();
+        context.rect(0, 0, this.width, this.height);
+        context.rect(item.x, item.y + item.h, item.w, -item.h);
+        context.fill('evenodd');
+        context.strokeStyle = "#000";
+        context.lineWidth = 2;
+        context.strokeRect(item.x, item.y, item.w, item.h);
+      break;
+    }
+    
   }
 
 

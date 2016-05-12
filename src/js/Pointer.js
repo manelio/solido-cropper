@@ -8,8 +8,14 @@ export default class Pointer {
     options = options || {};
 
     this.options = {
+      onPointerStart: function() {},
+      onPointerMove: function() {},
+      onPointerEnd: function() {},
+
       onBefore: function() {},
+      onMouseDown: function() {},
       onMove: function() {},
+      onMoveTwoPointers: function() {},
       onWheel: function() {}
     }
     
@@ -65,11 +71,27 @@ export default class Pointer {
     uDOM.stopEvent(e);
     document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
 
-    this.relativePoint = this.getRelativePoint(e.pageX, e.pageY);
+    let point = this.getRelativePoint(e.pageX, e.pageY);
+    
     this.valuesBefore.pagePoint = {x: e.pageX, y: e.pageY};
     this.saveValuesBefore();
 
+    this.relativePoint = point;
+
     (this.options.onMouseDown.bind(this))(e);
+    
+    (this.options.onPointerStart.bind(this))({
+      device: 'mouse',
+      event: e,
+      isMultiple: false,
+      npointers: 1,
+      x0: this.relativePoint.x,
+      y0: this.relativePoint.y,
+      x: point.x,
+      y: point.y,
+      pageX: e.pageX,
+      pageY: e.pageY
+    });
 
     uDOM.addEventListener(document, 'mousemove', this.onMouseMove);
     uDOM.addEventListener(document, 'mouseup', this.onMouseUp);
@@ -83,7 +105,21 @@ export default class Pointer {
         y: uDOM.getPageY(e) - this.valuesBefore.pagePoint.y
     };
 
+    (this.options.onPointerMove.bind(this))({
+      device: 'mouse',
+      event: e,
+      isMultiple: false,
+      npointers: 1,
+      x0: this.relativePoint.x,
+      y0: this.relativePoint.y,
+      deltaX: delta.x,
+      deltaY: delta.y,
+      pageX: e.pageX,
+      pageY: e.pageY
+    });
+
     (this.options.onMove.bind(this))(e, delta, this.relativePoint);
+
   }
 
   onMouseUp(e) {
@@ -99,7 +135,16 @@ export default class Pointer {
     this.relativePoint = this.getRelativePoint(e.pageX, e.pageY);
     this.saveValuesBefore();
 
-    (this.options.onWheel.bind(this))(e, {x: 0, y: -delta * 10}, this.relativePoint);
+    (this.options.onWheel.bind(this))({
+      event: e,
+      device: 'mouse',
+      x0: this.relativePoint.x,
+      y0: this.relativePoint.y,
+      x: this.relativePoint.x,
+      y: this.relativePoint.y,
+      deltaX: 0,
+      deltaY: -delta * 10
+    });
   }
 
   onTouchStart(e) {
@@ -158,9 +203,10 @@ export default class Pointer {
     this.resetPointers(e);
     this.npointers++;
 
+    let keys = Object.keys(this.pointers);
+    let p1 = this.pointers[keys[0]];
+
     if (this.npointers > 1) {
-      let keys = Object.keys(this.pointers);
-      let p1 = this.pointers[keys[0]];
       let p2 = this.pointers[keys[1]];
 
       this.p1id = keys[0];
@@ -175,6 +221,20 @@ export default class Pointer {
       this.vector0 = vector0;
       this.l0 = l0;
     }
+
+    (this.options.onPointerStart.bind(this))({
+      device: 'touch',
+      event: e,
+      isMultiple: this.npointers > 1,
+      npointers: this.npointers,
+      x0: this.relativePoint.x,
+      y0: this.relativePoint.y,
+      x: p1.relativePoint.x,
+      y: p1.relativePoint.y,
+      pageX: p1.pagePoint.x,
+      pageY: p1.pagePoint.y
+    });
+
   }
 
   handlePointerMoveOnePointer(e) {
@@ -190,9 +250,23 @@ export default class Pointer {
     let delta = {
       x: touch.pageX - this.pointers[id].pagePoint.x,
       y: touch.pageY - this.pointers[id].pagePoint.y
-    }
+    };
 
-    this.doPan(delta);
+    (this.options.onMove.bind(this))(e, delta, this.relativePoint);
+
+    (this.options.onPointerMove.bind(this))({
+      device: 'touch',
+      event: e,
+      isMultiple: this.npointers > 1,
+      npointers: this.npointers,
+      x0: this.relativePoint.x,
+      y0: this.relativePoint.y,
+      deltaX: delta.x,
+      deltaY: delta.y,
+      pageX: touch.pageX,
+      pageY: touch.pageY
+    });
+
   }
 
   handlePointerMoveTwoPointers(e) {
@@ -228,23 +302,28 @@ export default class Pointer {
     let vector = {
       x: touch2.pageX - touch1.pageX,
       y: touch2.pageY - touch1.pageY
-    }
+    };
 
-    let l = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
-    let deltal = l - this.l0;
-    var ang = Math.atan2(vector.y, vector.x) - Math.atan2(this.vector0.y, this.vector0.x);
+    (this.options.onMoveTwoPointers.bind(this))(e, delta, relativeMidpoint, this.vector0, vector, this.l0);
 
-    let factor = deltal / this.l0;
+    (this.options.onPointerMove.bind(this))({
+      device: 'touch',
+      event: e,
+      isMultiple: this.npointers > 1,
+      npointers: this.npointers,
+      x0: this.relativePoint.x,
+      y0: this.relativePoint.y,
+      x: relativeMidpoint.x,
+      y: relativeMidpoint.y,
+      deltaX: delta.x,
+      deltaY: delta.y,
+      pageX: touch.pageX,
+      pageY: touch.pageY,
+      l0: this.l0,
+      vector0: this.vector0,
+      vector: vector
+    });
 
-    this.transform
-      .setId()
-      .translate(relativeMidpoint.x, relativeMidpoint.y)
-      .translate(delta.x, delta.y)
-      .scale(1 + factor)
-      .rotate(ang)
-      .translate(-relativeMidpoint.x, -relativeMidpoint.y)
-      .multiply(this.valuesBefore.matrix)
-    ;
   }
 
   handlePointerMove(e) {
@@ -253,7 +332,6 @@ export default class Pointer {
     } else {
       this.handlePointerMoveOnePointer(e);
     }
-    this.refresh();
   }
 
   handlePointerEnd(pointer, e) {
