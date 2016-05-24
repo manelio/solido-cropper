@@ -1,4 +1,4 @@
-import SDOM from 'solido-dom';
+import uDOM from '../uDOM';
 import TransformationMatrix2D from '../TransformationMatrix2D';
 
 import Layer from './Layer';
@@ -8,7 +8,7 @@ export default class Canvas extends Layer {
   constructor() {
     super();
     
-    let el = SDOM.createElement('canvas');
+    let el = uDOM.createElement('canvas');
     this.context = el.getContext('2d');
     el.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%';
 
@@ -90,14 +90,12 @@ export default class Canvas extends Layer {
 
     let context = this.context;
 
-    
     context.drawImage(
       item.el,
       0, 0, item.originalWidth, item.originalHeight
     );
 
     return;
-    
 
     let tileSide = item.tileSide;
 
@@ -122,8 +120,7 @@ export default class Canvas extends Layer {
         let x = i*tileSide;
         let y = j*tileSide;
 
-        //let tile = this.getXImageTile(item, renderInfo, i, j);
-        let tile = false;
+        let tile = this.getXImageTile(item, renderInfo, i, j);
 
         if (tile) {
 
@@ -146,7 +143,7 @@ export default class Canvas extends Layer {
           console.log('after drawImage');
 
         } else {
-          //console.log(`WW no tile for ${i}, ${j} (${renderInfo.zoomLevel})`);
+          console.log(`WW no tile for ${i}, ${j} (${renderInfo.zoomLevel})`);
         }
 
         let originalTileSide = tileSide / renderInfo.scale;

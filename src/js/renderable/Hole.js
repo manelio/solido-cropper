@@ -2,10 +2,10 @@ import Renderable from './Renderable';
 
 export default class Hole extends Renderable {
 
-  code = 'hole';
-
   constructor(def) {
     super();
+
+    this.code = 'hole';
     
     this.x = def.x;
     this.y = def.y;

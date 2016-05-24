@@ -1,4 +1,5 @@
-import SDOM from 'solido-dom';
+import uDOM from '../uDOM';
+
 import Layer from './Layer';
 
 export default class SVG extends Layer {
@@ -14,7 +15,7 @@ export default class SVG extends Layer {
     let groupEl = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     groupEl.setAttributeNS(null, 'transform', 'matrix(1 0 0 1 0 0)');
 
-    SDOM.append(el, groupEl);
+    uDOM.append(el, groupEl);
 
     this.el = el;
     this.groupEl = groupEl;
@@ -44,7 +45,7 @@ export default class SVG extends Layer {
     super.addItem(item);
     let el = this.getElementForItem(item);
     if (el) {
-      SDOM.append(this.groupEl, el);
+      uDOM.append(this.groupEl, el);
     }
   }
 
@@ -87,8 +88,6 @@ export default class SVG extends Layer {
 
     switch(item.code) {
       case 'image':
-      case 'ximage':
-
         el = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         el.setAttributeNS(null, 'x', '0');
         el.setAttributeNS(null, 'y', '0');

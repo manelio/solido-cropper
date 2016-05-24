@@ -13,6 +13,11 @@ export default class TransformationMatrix2D {
     return this;
   };
 
+  copy(object) {
+    let m = object.getMatrix();
+    this.setMatrix(m);
+  }
+
   invert() {
     let m = this.m;
     let
@@ -96,7 +101,39 @@ export default class TransformationMatrix2D {
   };
 
   getScaleX() {
-    return Math.sqrt(this.m[0] * this.m[0] + this.m[1] * this.m[1]);
+    return (this.m[0] < 0?-1:1) * Math.sqrt(this.m[0] * this.m[0] + this.m[1] * this.m[1]);
+  }
+
+  getScaleY() {
+    return (this.m[2] < 0?-1:1) * Math.sqrt(this.m[2] * this.m[2] + this.m[3] * this.m[3]);
+  }
+
+  getTranslationX() {
+    return this.m[4];
+  }
+
+  getTranslationY() {
+    return this.m[5];
+  }
+
+  getRotation() {
+    let rad = Math.atan2(-this.m[1], this.m[0]);
+    //if (rad < 0) rad += Math.PI * 2;
+    return rad;
+
+    //return Math.atan2(-this.m[2], this.m[3]);
+  }
+
+  getPositiveRotation() {
+    let rotation = this.getRotation();
+    return this.toPositiveAngle(rotation);
+  }
+
+  toPositiveAngle(angle)
+  {
+     angle = angle % Math.PI * 2;
+     if (angle < 0) angle += Math.PI * 2;
+     return angle;
   }
 
   transformPoint(px, py) {
@@ -125,6 +162,25 @@ export default class TransformationMatrix2D {
     this.m[4] = m[4];
     this.m[5] = m[5];
     return this;
+  }
+
+  getTransformations() {
+    return {
+      translationX: this.getTranslationX(),
+      translationY: this.getTranslationY(),
+      scaleX: this.getScaleX(),
+      scaleY: this.getScaleY(),
+      rotation: this.getRotation()
+    }
+  }
+
+  fromTRS(tx, ty, r, sx, sy) {
+    this.m[0] = sx * Math.cos(r);
+    this.m[1] = -sx * Math.sin(r);
+    this.m[2] = sy * Math.sin(r);
+    this.m[3] = sy * Math.cos(r);
+    this.m[4] = tx;
+    this.m[5] = ty;
   }
 
 }

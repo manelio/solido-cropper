@@ -1,23 +1,39 @@
-import uDOM from '../uDOM';
+import SDOM from 'solido-dom';
 import Renderable from './Renderable';
 
-export default class Image extends Renderable {
+export default class ImageObject extends Renderable {
 
-  code = 'image';
 
   constructor(image) {
     super();
-    this.setImage(image);
+    this.ready = false;
+    this.code = 'image';
+    this._constructor(image);
+  }
+
+  _constructor(image) {
+    if (image) {
+      this.setImage(image);
+    }
   }
 
   setImage(image) {
-    this.el = image;
+    this.ready = false;
+
+    if (SDOM.isElement(image)) {
+      this.el = image;
+    } else {
+      this.el = new Image;
+      this.el.src = image;
+      image = this.el;
+    }
 
     if (image.complete) {
       this.onImageLoaded();
     }
     else {
-      uDOM.addEventListener(image, 'load', this.onImageLoaded.bind(this));
+      this.eventEmitter.emit('loading', this);
+      SDOM.addEventListener(image, 'load', this.onImageLoaded.bind(this));
     }
   }
 
@@ -27,6 +43,10 @@ export default class Image extends Renderable {
 
     this.w = this.originalWidth;
     this.h = this.originalHeight;
+
+    this.eventEmitter.emit('loaded', this);
+    this.eventEmitter.emit('ready', this);
+    this.ready = true;
   }
 
 }

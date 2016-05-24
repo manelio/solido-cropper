@@ -12,6 +12,8 @@ body {
 }
 
 .__humblecropper-container {
+    font-family: Verdana,Geneva,sans-serif;
+
     //background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAAA3NCSVQICAjb4U/gAAAABlBMVEXMzMz////TjRV2AAAACXBIWXMAAArrAAAK6wGCiw1aAAAAHHRFWHRTb2Z0d2FyZQBBZG9iZSBGaXJld29ya3MgQ1M26LyyjAAAABFJREFUCJlj+M/AgBVhF/0PAH6/D/HkDxOGAAAAAElFTkSuQmCC");
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYlWNgYGCQwoKxgqGgcJA5h3yFAAs8BRWVSwooAAAAAElFTkSuQmCC");
     
@@ -37,6 +39,20 @@ body {
         z-index: 9999;
         opacity: 1;
     }
+}
+
+.__humblecropper-debug-info-box {
+    label {
+        float: left;
+        width: 60px;
+
+        color: #ccc;
+    }
+
+    background: rgba(0, 0, 0, .75);
+    color: #fff;
+    padding: 5px;
+    font-size: 10px;
 }
 
 .__humblecropper-container.loaded {

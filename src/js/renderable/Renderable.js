@@ -1,8 +1,12 @@
+import EventEmitter from '../events/EventEmitter';
+
 export default class Renderable {
 
-  code = 'none';
-
   constructor() {
+    this.eventEmitter = new EventEmitter();
+
+    this.ready = true;
+    this.code = 'none';
     this.layer = {}
 
     this.x = 0;
@@ -18,7 +22,7 @@ export default class Renderable {
     this.layer.dirty = true;
   }
 
-  setPosition(x, y) {    
+  setPosition(x, y) {
     this.x = x;
     this.y = y;
 

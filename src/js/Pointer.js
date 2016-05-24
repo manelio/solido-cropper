@@ -1,4 +1,4 @@
-import uDOM from './uDOM';
+import SDOM from 'solido-dom';
 
 export default class Pointer {
 
@@ -11,6 +11,7 @@ export default class Pointer {
       onPointerStart: function() {},
       onPointerMove: function() {},
       onPointerEnd: function() {},
+      onPointerClick: function() {},
 
       onBefore: function() {},
       onMouseDown: function() {},
@@ -26,6 +27,7 @@ export default class Pointer {
 
     this.pointers = {};
     this.npointers = 0;
+    this.moved = false;
 
     this.attachEvents();
   }
@@ -38,16 +40,16 @@ export default class Pointer {
     this.onMouseUp = this.onMouseUp.bind(this);    
     this.onMouseWheel = this.onMouseWheel.bind(this);
 
-    uDOM.addEventListener(this.el, 'mousedown', this.onMouseDown);
-    uDOM.addEventListener(this.el, 'mousewheel', this.onMouseWheel);
-    uDOM.addEventListener(this.el, 'DOMMouseScroll', this.onMouseWheel);
+    SDOM.addEventListener(this.el, 'mousedown', this.onMouseDown);
+    SDOM.addEventListener(this.el, 'mousewheel', this.onMouseWheel);
+    SDOM.addEventListener(this.el, 'DOMMouseScroll', this.onMouseWheel);
 
     // Touch devices
     this.onTouchStart = this.onTouchStart.bind(this);
     this.onTouchMove = this.onTouchMove.bind(this);
     this.onTouchEnd = this.onTouchEnd.bind(this);
 
-    uDOM.addEventListener(this.el, 'touchstart', this.onTouchStart);
+    SDOM.addEventListener(this.el, 'touchstart', this.onTouchStart);
 
   }
 
@@ -68,8 +70,10 @@ export default class Pointer {
   }
 
   onMouseDown(e) {
-    uDOM.stopEvent(e);
+    SDOM.stopEvent(e);
     document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
+
+    this.moved = false;
 
     let point = this.getRelativePoint(e.pageX, e.pageY);
     
@@ -93,16 +97,18 @@ export default class Pointer {
       pageY: e.pageY
     });
 
-    uDOM.addEventListener(document, 'mousemove', this.onMouseMove);
-    uDOM.addEventListener(document, 'mouseup', this.onMouseUp);
+    SDOM.addEventListener(document, 'mousemove', this.onMouseMove);
+    SDOM.addEventListener(document, 'mouseup', this.onMouseUp);
   }
 
   onMouseMove(e) {
+    this.moved = true;
+
     if (!this.valuesBefore.pagePoint) return;
 
     var delta = {
-        x: uDOM.getPageX(e) - this.valuesBefore.pagePoint.x,
-        y: uDOM.getPageY(e) - this.valuesBefore.pagePoint.y
+        x: SDOM.getPageX(e) - this.valuesBefore.pagePoint.x,
+        y: SDOM.getPageY(e) - this.valuesBefore.pagePoint.y
     };
 
     (this.options.onPointerMove.bind(this))({
@@ -125,10 +131,22 @@ export default class Pointer {
   onMouseUp(e) {
     this.item = false;
 
-    uDOM.removeEventListener(document, 'mousemove', this.onMouseMove);
-    uDOM.removeEventListener(document, 'mouseup', this.onMouseUp);
-  }
+    if (this.moved === false ) {
+      (this.options.onPointerClick.bind(this))({
+        device: 'mouse',
+        event: e,
+        isMultiple: false,
+        npointers: 1,
+        x0: this.relativePoint.x,
+        y0: this.relativePoint.y,
+        pageX: e.pageX,
+        pageY: e.pageY
+      });
+    }
 
+    SDOM.removeEventListener(document, 'mousemove', this.onMouseMove);
+    SDOM.removeEventListener(document, 'mouseup', this.onMouseUp);
+  }
 
   onMouseWheel(e) {
     var delta = e.wheelDelta ? e.wheelDelta/40 : e.detail ? -e.detail : 0;
@@ -148,12 +166,13 @@ export default class Pointer {
   }
 
   onTouchStart(e) {
-    uDOM.stopEvent(e);
+    SDOM.stopEvent(e);
+    this.moved = true;
 
     this.saveValuesBefore();
-    if (this.npointers === 0) {
-      uDOM.addEventListener(this.el, 'touchmove', this.onTouchMove);
-      uDOM.addEventListener(this.el, 'touchend', this.onTouchEnd);
+    if (this.npointers === 0) {     
+      SDOM.addEventListener(this.el, 'touchmove', this.onTouchMove);
+      SDOM.addEventListener(this.el, 'touchend', this.onTouchEnd);
     }
 
     for(let i = 0; i < e.changedTouches.length; i++) {
@@ -162,12 +181,14 @@ export default class Pointer {
   }
 
   onTouchMove(e) {
-    uDOM.stopEvent(e);
+    SDOM.stopEvent(e);
+    this.moved = true;
+
     this.handlePointerMove(e);
   }
 
   onTouchEnd(e) {
-    uDOM.stopEvent(e);
+    SDOM.stopEvent(e);
     this.saveValuesBefore();
 
     for(let i = 0; i < e.changedTouches.length; i++) {
@@ -176,8 +197,24 @@ export default class Pointer {
 
     var n = Object.keys(this.pointers).length;
     if (n === 0) {
-      uDOM.removeEventListener(this.el, 'touchmove', this.onTouchMove);
-      uDOM.removeEventListener(this.el, 'touchend', this.onTouchEnd);
+
+      if (this.moved === false) {
+        (this.options.onPointerClick.bind(this))({
+          device: 'touch',
+          event: e,
+          isMultiple: this.npointers > 1,
+          npointers: this.npointers,
+          x0: this.relativePoint.x,
+          y0: this.relativePoint.y,
+          x: p1.relativePoint.x,
+          y: p1.relativePoint.y,
+          pageX: p1.pagePoint.x,
+          pageY: p1.pagePoint.y
+        });
+      }
+
+      SDOM.removeEventListener(this.el, 'touchmove', this.onTouchMove);
+      SDOM.removeEventListener(this.el, 'touchend', this.onTouchEnd);
     }
   }
 
@@ -340,6 +377,8 @@ export default class Pointer {
     let id = pointer.identifier;
     delete this.pointers[id];
     this.npointers--;
+
+    //console.log('pointers ' + this.npointers);
   }
 
 

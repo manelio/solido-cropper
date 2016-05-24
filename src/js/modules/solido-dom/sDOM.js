@@ -1,7 +1,8 @@
-export default class uDOM {
+let _rAF = null;
+let _cAF = null;
 
-  _rAF = null;
-  
+export default class SDOM {
+
   static isElement(obj) {
     try {
       // Using W3 DOM2 (works for FF, Opera and Chrom)
@@ -87,39 +88,54 @@ export default class uDOM {
   }
 
   static requestAnimationFrame(callback) {
-    if (this._rAF) return this._rAF.call(window, callback);
+    if (_rAF) return _rAF.call(window, callback);
 
     if (window.requestAnimationFrame) {
-      this._rAF = window.requestAnimationFrame;
-      this._cAF = window.cancelAnimationFrame;
-      return this._rAF.call(window, callback);
+      _rAF = window.requestAnimationFrame;
+      return _rAF.call(window, callback);
     }
 
     this.lastTime = 0;
     var vendors = ['webkit', 'moz'];
     for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-        this._rAF = window[vendors[x]+'RequestAnimationFrame'];
-        this._cAF = window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+      _rAF = window[vendors[x]+'RequestAnimationFrame'];
     }
 
-    if (!window.requestAnimationFrame)
-        this._rAF = function(callback, element) {
-            var currTime = new Date().getTime();
-            var timeToCall = Math.max(0, 16 - (currTime - this.lastTime));
-            var id = window.setTimeout(function() { callback(currTime + timeToCall); },
-              timeToCall);
-            this.lastTime = currTime + timeToCall;
-            return id;
-        };
+    if (!window.requestAnimationFrame) {
+      _rAF = function(callback, element) {
+        var currTime = new Date().getTime();
+        var timeToCall = Math.max(0, 16 - (currTime - this.lastTime));
+        var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+          timeToCall);
+        this.lastTime = currTime + timeToCall;
+        return id;
+      };
+    }
 
-    if (!window.cancelAnimationFrame)
-        this._cAF.cancelAnimationFrame = function(id) {
-            clearTimeout(id);
-        };
-
-    return this._rAF.call(window, callback);
+    return _rAF.call(window, callback);
   }
 
+  static cancelAnimationFrame(callback) {
+    if (_cAF) return _cAF.call(window, callback);
 
+    if (window.cancelAnimationFrame) {
+      _cAF = window.cancelAnimationFrame;
+      return _rAF.call(window, callback);
+    }
+
+    this.lastTime = 0;
+    var vendors = ['webkit', 'moz'];
+    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+        _cAF = window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+    }
+
+    if (!window.cancelAnimationFrame) {
+      _cAF = function(id) {
+        clearTimeout(id);
+      };
+    }
+
+    return _cAF.call(window, callback);
+  }
 
 }

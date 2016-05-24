@@ -23,14 +23,21 @@ jsLoader = {
   test: /\.jsx?$/,
   exclude: /(node_modules|bower_components)/,
   loaders: [
-    'es3ify',
+    //'es3ify',
     'babel?' + JSON.stringify({
-      presets: ['es2015', 'stage-0'],
+      cacheDirectory: true,
+      presets: ['es2015'],
       plugins: [
         ["add-module-exports"]
-        //['transform-es2015-modules-commonjs', { "loose": true }],
-        //['transform-es3-property-literals', {}],
-        //['transform-es3-member-expression-literals', {}]
+        /*
+        ,
+        ["transform-es2015-classes", {
+          "loose": true
+        }],
+        ['transform-es2015-modules-commonjs', { "loose": true }],
+        ['transform-es3-property-literals', {}],
+        ['transform-es3-member-expression-literals', {}]
+        */
       ]
     })
   ]
@@ -178,8 +185,9 @@ webpackConfig = {
     extensions: [ '', '.js', '.json' ],
     modulesDirectories: [
       'node_modules',
-      'bower_components'
-    ],    
+      'bower_components',
+      'src/js/modules'
+    ],
   },
   /*
   externals: {

@@ -1,4 +1,4 @@
-import SDOM from 'solido-dom';
+import uDOM from '../uDOM';
 import Layer from './Layer';
 
 export default class SVG extends Layer {
@@ -6,7 +6,7 @@ export default class SVG extends Layer {
   constructor() {
     super();
 
-    let el = SDOM.createElement('div');
+    let el = uDOM.createElement('div');
     el.className = 'domcss3-layer';
     el.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; transform-origin: top left';
     
@@ -35,7 +35,7 @@ export default class SVG extends Layer {
 
     el.style.display = 'block';
 
-    SDOM.append(this.el, el);
+    uDOM.append(this.el, el);
   }
 
   renderItem(item) {

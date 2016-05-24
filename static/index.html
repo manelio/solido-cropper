@@ -7,17 +7,9 @@
 </head>
 
 <body>
-<div class="example1">    
-    
-    <div class="devel-info">
-        <div class="devel-info-details">
-            pan: left click + drag, zoom: wheel or right click + drag, rotate: middle click + drag.
-            <a href="#" id="test1">test1</a>
-            <a href="javascript:void(0)" onclick="cropper.fith()">fith</a>
-            <a href="javascript:void(0)" onclick="cropper.fitw()">fitw</a>
-        </div>
-    </div>
-    
+<div class="example1">
+    <!-- <img style="display: none" src="all-futurama-characters-1920.jpg" /> -->
+    <!-- <img style="display: none" src="all-futurama-characters.jpg" /> -->
     <!-- <img style="display: none" src="gradient10000.jpg" /> -->
     <!-- <img style="display: none" src="big-image.jpg" /> -->
     <img style="display: none" src="normal-image.jpg" />
@@ -25,6 +17,24 @@
     <!-- <img style="display: none" src="test-image.jpg" /> -->
     <!-- <img style="display: none" src="500px.jpg" /> -->
 </div>
+
+
+<div id="debug-actions" class="devel-info" style="xdisplay: none;">
+    <div class="devel-info-details">
+        <a href="javascript:void(0)" onclick="cropper.setImage('escher.jpg')">2246x2091<br />Escher</a>
+        <a href="javascript:void(0)" onclick="cropper.setImage('normal-image.jpg')">1620x1080<br />Image</a>
+        <a href="javascript:void(0)" onclick="cropper.setImage('big-image.jpg')">5100x3300<br />Image</a>
+        <a href="javascript:void(0)" onclick="cropper.setImage('all-futurama-characters.jpg')">5056x3576<br />Futurama<br />Image</a>
+        <a href="javascript:void(0)" onclick="cropper.targetRandomPoint()">Random<br />target</a>
+    </div>
+</div>
+
+<div id="help">
+    When using mouse:<br />
+    Rotate with shift + left-button drag or middle-button drag.<br />
+    Scale with righ-button drag or mouse wheel.
+</div>
+
 
 <script src="../dist/js/humblecropper.js"></script>
 <!--
@@ -37,6 +47,12 @@
   var image = document.querySelector('.example1 img');
   window.cropper = new HumbleCropper(image);
 
+  var debugActionsEl = document.getElementById('debug-actions');
+
+  var helpEl = document.getElementById('help');
+  cropper.dom.container.appendChild(helpEl);
+
+    /*
     var test1 = document.getElementById('test1');
     test1.addEventListener('click', function(e) {
         e.preventDefault();
@@ -46,6 +62,7 @@
 
         return false;
     });
+    */
 
 })();
 </script>
