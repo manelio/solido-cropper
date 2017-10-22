@@ -101,11 +101,13 @@ export default class TransformationMatrix2D {
   };
 
   getScaleX() {
-    return (this.m[0] < 0?-1:1) * Math.sqrt(this.m[0] * this.m[0] + this.m[1] * this.m[1]);
+    //return (this.m[0] < 0?-1:1) * Math.sqrt(this.m[0] * this.m[0] + this.m[1] * this.m[1]);
+    return Math.abs(Math.sqrt(this.m[0] * this.m[0] + this.m[1] * this.m[1]));
   }
 
   getScaleY() {
-    return (this.m[2] < 0?-1:1) * Math.sqrt(this.m[2] * this.m[2] + this.m[3] * this.m[3]);
+    //return (this.m[2] < 0?-1:1) * Math.sqrt(this.m[2] * this.m[2] + this.m[3] * this.m[3]);
+    return Math.abs(Math.sqrt(this.m[2] * this.m[2] + this.m[3] * this.m[3]));
   }
 
   getTranslationX() {
@@ -131,7 +133,7 @@ export default class TransformationMatrix2D {
 
   toPositiveAngle(angle)
   {
-     angle = angle % Math.PI * 2;
+     angle = angle % (Math.PI * 2);
      if (angle < 0) angle += Math.PI * 2;
      return angle;
   }
@@ -147,7 +149,26 @@ export default class TransformationMatrix2D {
     py = x * m[1] + y * m[3] + m[5];
 
     return [px, py];
-  };  
+  };
+
+  transformPointInverse(px, py) {
+
+    let x = px, y = py, m = this.m;
+
+    px = (m[2] * m[5] 
+    - m[2] * y 
+    - m[3] * m[4] 
+    + m[3] * x)
+    / (m[0] * m[3] - m[1] * m[2]);
+
+    py = (-m[0] * m[5]
+    + m[0] * y
+    + m[1] * m[4]
+    - m[1] * x) 
+    / (m[0] * m[3] - m[1] * m[2]);
+
+    return [px, py];
+  }
 
   getMatrix() {
     let m = this.m;
@@ -175,12 +196,40 @@ export default class TransformationMatrix2D {
   }
 
   fromTRS(tx, ty, r, sx, sy) {
-    this.m[0] = sx * Math.cos(r);
-    this.m[1] = -sx * Math.sin(r);
-    this.m[2] = sy * Math.sin(r);
-    this.m[3] = sy * Math.cos(r);
-    this.m[4] = tx;
-    this.m[5] = ty;
+
+    if (typeof(sy) === 'undefined') {
+      sy = sx;
+    }
+    let _tx = parseFloat(tx),
+      _ty = parseFloat(ty),
+      _r = parseFloat(r),
+      _sx = parseFloat(sx),
+      _sy = parseFloat(sy)
+    ;
+
+    this.m[0] = _sx * Math.cos(_r);
+    this.m[1] = -_sx * Math.sin(_r);
+    this.m[2] = _sy * Math.sin(_r);
+    this.m[3] = _sy * Math.cos(_r);
+    this.m[4] = _tx;
+    this.m[5] = _ty;
   }
 
+  toCSS3MatrixString() {
+    let m = this.m;
+    return `matrix(${m[0]}, ${m[1]}, ${m[2]}, ${m[3]}, ${m[4]}, ${m[5]})`;
+  }
+
+}
+
+var isBrowser = new Function("try {return this === window;}catch(e){ return false;}");
+if (isBrowser) {
+  if (!('solido' in window)) {
+    window.solido = {};
+  }
+  if (!('math' in window.solido)) {
+    window.solido.math = {};
+  }
+
+  window.solido.math.mat2d = TransformationMatrix2D;
 }

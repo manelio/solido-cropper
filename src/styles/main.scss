@@ -1,3 +1,5 @@
+@import './font';
+
 @mixin full-absolute() {
     position: absolute;
     top: 0;
@@ -11,26 +13,28 @@ body {
     padding: 0;
 }
 
-.__humblecropper-container {
+.__solidocropper-container {
+
     font-family: Verdana,Geneva,sans-serif;
 
     //background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAAA3NCSVQICAjb4U/gAAAABlBMVEXMzMz////TjRV2AAAACXBIWXMAAArrAAAK6wGCiw1aAAAAHHRFWHRTb2Z0d2FyZQBBZG9iZSBGaXJld29ya3MgQ1M26LyyjAAAABFJREFUCJlj+M/AgBVhF/0PAH6/D/HkDxOGAAAAAElFTkSuQmCC");
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYlWNgYGCQwoKxgqGgcJA5h3yFAAs8BRWVSwooAAAAAElFTkSuQmCC");
     
     @include full-absolute();
+    width: 100%;
+    height: 100%;
+    overflow: visible;
 
     canvas {
         @include full-absolute();
     }
 
-    .__humblecropper-overlay {
+    .__solidocropper-viewport {
         @include full-absolute();
-        background: #fff;
-        z-index: 9999;
-        opacity: 1;
+        overflow: hidden;
     }
 
-    .__humblecropper-overlay {
+    .__solidocropper-overlay {
 
         transition: opacity .75s ease-in;
 
@@ -41,7 +45,14 @@ body {
     }
 }
 
-.__humblecropper-debug-info-box {
+.__solidocropper-debug-info-box {
+
+    position: absolute;
+    top: 15px;
+    left: 15px;
+
+    text-align: left;
+
     label {
         float: left;
         width: 60px;
@@ -53,12 +64,150 @@ body {
     color: #fff;
     padding: 5px;
     font-size: 10px;
+
+    z-index: 7;
 }
 
-.__humblecropper-container.loaded {
-    .__humblecropper-overlay {
+.__solidocropper-container.loaded {
+    .__solidocropper-overlay {
         opacity: 0;
     }
+}
+
+.__solidocropper-controlbox-handle {
+    background: rgba(255, 255, 255, .25);
+}
+
+.__solidocropper-controlbox-hide-handles .__solidocropper-controlbox-handle {
+    display: none;
+}
+
+.__solidocropper-toolbox {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+
+    z-index: 12;
+
+    width: 186px;
+}
+
+@keyframes anim-effect-novak {
+    0% {
+        opacity: 1;
+        -webkit-transform: scale3d(0.1, 0.1, 1);
+        transform: scale3d(0.1, 0.1, 1);
+    }
+    100% {
+        opacity: 0;
+        -webkit-transform: scale3d(8, 8, 1);
+        transform: scale3d(8, 8, 1);
+    }
+}
+
+.__solidocropper-button {
+    position: relative;
+    display: inline-block;
+
+    border: none;
+    background: none;
+
+    /*margin: 1em;*/
+    /*
+    padding: 0;
+    border: none;
+    background: none;
+    color: #286aab;
+    font-size: 1.4em;
+    overflow: visible;
+    -webkit-transition: color 0.7s;
+    transition: color 0.7s;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    */
+
+
+    /*
+    &::after {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin: -35px 0 0 -35px;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        content: '';
+        opacity: 0;
+        pointer-events: none;
+    }
+    */
+
+    width: 50px;
+    height: 50px;
+
+    .__solidocropper-button-inner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        border-radius: 50%;
+        border: none;
+
+        /* background: rgba(255, 255, 0, .75); */
+        background: rgba(#7B1FA2, .75);
+
+        z-index: 12;
+
+        text-align: center;
+
+        box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
+
+        span {
+            color: #fff;
+            font-size: 25px;
+            line-height: 51px;
+        }
+
+
+
+    }
+
+    margin: 5px;
+}
+
+
+.__solidocropper-button::after {
+    background: rgba(111, 148, 182, 0.50);
+}
+
+/*
+.__solidocropper-button.__solidocropper-button-down::after {
+    -webkit-animation: anim-effect-novak 0.5s forwards;
+    animation: anim-effect-novak 0.5s forwards;
+}
+*/
+
+.__solidocropper-button.__solidocropper-button-down {
+    box-shadow: none;
+}
+
+.__solidocropper-button.__solidocropper-button-down .__solidocropper-button-inner {
+    margin-top: 2px;
+    margin-left: 2px;
+}
+
+.__solidocropper-button-settings {
+
+}
+
+.__solidocropper-disabled .__solidocropper-button {
+    display: none;
+}
+
+.__solidocropper-disabled .__solidocropper-sensor {
+    background: #fff;
+    opacity: .5;
 }
 
 .viewport-overlay {

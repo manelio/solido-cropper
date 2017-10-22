@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="SolidoCropper Canvas, SVG and DOM/CSS3 Demos.">
+    <meta name="keywords" content="HTML, CSS, JS, JavaScript, image cropping, cropper, solidocropper, solido cropper, canvas, svg, dom, front-end, web development">
+    <meta name="author" content="Manel R. Doménech">
+
+    <link rel="stylesheet" href="../../dist/styles/solidocropper.css" />
+    <link rel="stylesheet" href="demos.css" />
+    <link rel="stylesheet" href="engines.css" />
+</head>
+
+<body>
+
+<div id="main-wrapper">
+<div id="main-container" class="main-container">
+    <a href="../index.html">Back to demos list</a>
+
+    <div>
+    <ul>
+    <li>Click on a disabled cropper to enable it, and click outside to disable it.</li>
+    <li>Click inside selection area to toggle handles.</li>
+    <li>You can move the simple toolbar by dragging the gear icon.</li>
+    <li>You can rotate and scale the image by dragging the rotate and scale icons.</li>
+    <li>Also, you can move, scale and rotate the image using the mouse in combination with &lt;shift&gt; and &lt;command&gt; keys, ...</li>
+    <li>... or using gestures in touch-enabled devices.</li>
+    </ul>
+    </div>
+
+    <div class="ex ex1">
+        <h2>Canvas</h2>
+        <div class="image-container">
+            <img src="../images/victoriassecretangels.jpg" />
+        </div>
+    </div>
+    <div class="ex ex2">
+        <h2>SVG</h2>
+        <div class="image-container">
+            <img src="../images/victoriassecretangels.jpg" />
+        </div>
+    </div>
+    <div class="ex ex3">
+        <h2>DOM/CSS3</h2>
+        <div class="image-container">
+            <img src="../images/victoriassecretangels.jpg" />
+        </div>
+    </div>
+</div>
+</div>
+
+
+<script src="../../dist/js/solidocropper.js"></script>
+
+<script>
+;(function() {
+
+  
+  var c;
+  var croppers = [];
+
+  var image1 = document.querySelector('.ex1 img');
+  c = new SolidoCropper({
+    image: image1,
+    renderer: 'canvas'
+  });
+  croppers.push(c);
+
+  var image2 = document.querySelector('.ex2 img');
+  c = new SolidoCropper({
+    image: image2,
+    renderer: 'SVG'
+  });
+  croppers.push(c);
+
+  var image3 = document.querySelector('.ex3 img');
+  c = new SolidoCropper({
+    image: image3,
+    renderer: 'DOMCSS3'
+  });
+  croppers.push(c);
+
+  var activeCropper = null;
+  var clickStartedOnCropper = false;
+
+  function attachActivateHandler(el, cropper) {
+    el.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (activeCropper) {
+        activeCropper.disable();
+      }
+
+      activeCropper = cropper;
+      cropper.enable();
+    });
+
+    el.addEventListener('mousedown', function(e) {
+      e.stopPropagation();
+      clickStartedOnCropper = true;
+    });
+  }
+
+  for (var i = 0; i < croppers.length; i++) {
+    c = croppers[i];
+    c.disable();
+    attachActivateHandler(c.dom.container, c);
+  }
+
+  var wrapper = document.getElementById('main-wrapper');
+  wrapper.addEventListener('click', disableActiveCropper);
+  
+  document.addEventListener('mousedown', function() {
+    clickStartedOnCropper = false;
+  })
+
+  function disableActiveCropper(e) {
+    if (clickStartedOnCropper) {
+      return;
+    }
+    if (activeCropper) {
+      activeCropper.disable();
+      activeCropper = null;
+    }
+  }
+
+  
+})();
+</script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44440369-1', 'auto');
+  ga('send', 'pageview', location.pathname);
+</script>
+
+</body>
+</html>

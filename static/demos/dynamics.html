@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="SolidoCropper Pointer Demos.">
+    <meta name="keywords" content="HTML, CSS, JS, JavaScript, image cropping, cropper, solidocropper, solido cropper, canvas, svg, dom, front-end, web development">
+    <meta name="author" content="Manel R. Doménech">
+
+    <link rel="stylesheet" href="../../dist/styles/solidocropper.css" />
+    <link rel="stylesheet" href="demos.css" />
+    <link rel="stylesheet" href="pointer.css" />
+
+    <style>
+    #canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, .75);
+      color: white;
+      z-index: 9;
+
+      padding: 10px;
+    }
+    </style>
+</head>
+
+<body>
+
+<div id="main-wrapper">
+<div id="main-container" class="main-container">
+    <!-- <a href="../index.html">Back to demos list</a> -->
+
+    <canvas id="canvas">
+    </canvas>
+
+    <div id="info">
+    </div>
+
+</div>
+</div>
+
+
+<script src="../../dist/js/solidocropper.js"></script>
+
+<script>
+;(function() {
+
+  var canvas = document.getElementById('canvas');
+  var context = canvas.getContext('2d');
+  var infoBox = document.getElementById('info');
+  var w, h;
+  var ticking = false;
+  var dirty = false;
+
+  var massQty = 0;
+
+  var masses = {};
+
+
+  function render() {
+
+    var t = Date.now();
+    var dt = t - t0;
+    t0 = t;
+
+    var keys;
+
+    keys = Object.keys(masses);
+
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      var mass = masses[key];
+
+      if (mass.destroy) {
+        delete masses[key];
+        continue;
+      }
+
+      if (mass.free) {
+        release(key, dt);
+      }
+    }
+
+    keys = Object.keys(masses);
+
+    context.save();
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      var mass = masses[key];
+      
+      context.beginPath();
+      context.arc(mass.x, mass.y, 40, 0, 2 * Math.PI, false);
+      context.fillStyle = mass.color;
+      context.fill();
+
+      context.lineWidth = 2;
+      context.strokeStyle = '#003300';
+
+      if (mass.points) {
+
+        var x = mass.x;
+        var y = mass.y;
+
+        context.moveTo(x, y);
+
+        var n = mass.points.length;
+        for (var j = 0; j < n; j++) {
+          var p = mass.points[n - 1 - j];
+          x = x - p[2][0];
+          y = y - p[2][1];
+
+          context.lineTo(x, y);
+          context.moveTo(x, y);
+        }
+      }
+
+      if (mass.free) {
+        //context.arc(mass.x0, mass.y0, 40, 0, 2 * Math.PI, false);
+        //context.fill();
+        //context.moveTo(mass.x0, mass.y0);
+        //context.lineTo(mass.x, mass.y);
+      }
+
+      context.stroke();
+
+
+
+      if ('vx' in mass) {
+
+      }
+    }
+
+    context.restore();
+
+    ticking = false;
+
+    if (dirty) {
+      update();
+      dirty = false;
+    }
+  }
+  
+  var t0;
+
+  function update() {
+    if (!ticking) {
+      
+      if (!t0) {
+        t0 = Date.now();
+      }
+
+      requestAnimFrame(render);
+    }
+    ticking = true;
+  }
+
+  var move = function(info) {
+
+    if (info.combined && info.npointers === 1) return;
+
+    var el = this.el;
+
+      context.beginPath();
+      context.arc(info.pageX, info.pageY, 20, 0, 2 * Math.PI, false);
+      context.fillStyle = info.combined?'blue':'green';
+      context.fill();
+      
+      context.lineWidth = 1;
+      context.strokeStyle = '#003300';
+      context.stroke();
+
+      var debug = ''
+      + '<div>l: ' + info.deltaL + '</div>' 
+      + '<div>ang: ' + info.deltaAngDeg + '</div>'
+      ;
+
+      infoBox.innerHTML = debug;
+  };
+
+  var p = solido.pointerManager(canvas);
+  
+  p.on('pointerstart', function(event) {
+    var pointer = event.pointer;
+
+    var mass = {
+      x: event.pageX,
+      y: event.pageY,
+      color: '#'+(0x1000000+(Math.random())*0xffffff).toString(16).substr(1,6)
+    }
+
+    var massId = massQty++;
+
+    //console.log('start ' + massId);
+    //console.log(pointer);
+
+    masses[massId] = mass;
+
+    update();
+
+    pointer
+      .on('move', function(event) {
+        var mass = masses[massId];
+        mass.x = event.pageX;
+        mass.y = event.pageY;
+        update();
+
+        //console.log(this.getTrackingPoints());
+
+        //console.log(masses);
+
+      })
+      .on('end', function() {
+        update();
+        mass.free = true;
+
+        var points = this.tracking.getValues();
+        //var p1 = points.pop();
+
+        var n = points.length;
+
+        if (n) {
+          var lastPoint = points[n - 1];
+
+          //console.log(massId + ': ' + lastPoint.dt);
+
+          if (!lastPoint[1]) {
+            console.log(points);
+          }
+
+          mass.vx = lastPoint[2][0] * 1000 / lastPoint[1];
+          mass.vy = lastPoint[2][1] * 1000 / lastPoint[1];
+        } else {
+          mass.vx = 0;
+          mass.vy = 0;
+        }
+
+        //console.log(mass.vx);
+        //console.log(mass.vy);
+
+        mass.points = points;
+
+        //mass.vx = p1.x * 100 / p1.dt;
+        //mass.vy = p1.y * 100 / p1.dt;
+
+        //release(massId);
+        //delete masses[massId];
+      });
+  });
+  //.on('pointersmove', move);
+
+
+  function release(massId, dt) {
+    var mass = masses[massId];
+
+    mass.x0 = mass.x;
+    mass.y0 = mass.y;
+
+    mass.x += mass.vx * dt / 1000;
+    mass.y += mass.vy * dt / 1000;
+
+    mass.vx *= 0.95;
+    mass.vy *= 0.95;
+
+    //mass.y += .75;
+
+    if (mass.x < 0) {
+      mass.x = 0;
+      mass.vx = - mass.vx;
+    }
+
+    if (mass.y < 0) {
+      mass.y = 0;
+      mass.vy = - mass.vy;
+    }
+
+    if (mass.x > canvas.width) {
+      mass.x = canvas.width;
+      mass.vx = -mass.vx;
+    }
+
+    if (mass.y > canvas.height) {
+      mass.y = canvas.height;
+      mass.vy = -mass.vy;
+    }
+
+    if (window.debug) console.log(massId + ': ' +mass.x + ', ' + mass.y + ', ' + mass.vx + ', ' + mass.vy);
+
+    if (Math.abs(mass.vx) < .1 && Math.abs(mass.vy) < .1) {
+      mass.destroy = true;
+    }
+
+    dirty = true;
+  }
+
+  function resize() {
+    var width = window.innerWidth
+    || document.documentElement.clientWidth
+    || document.body.clientWidth;
+
+    var height = window.innerHeight
+    || document.documentElement.clientHeight
+    || document.body.clientHeight;
+    
+    canvas.width = width;
+    canvas.height = height;
+  }
+  
+  document.addEventListener("DOMContentLoaded", function(event) {
+    resize();
+  });
+
+  window.addEventListener("resize", function(event) {
+    resize();
+  });
+
+
+  var requestAnimFrame = (function(){
+    return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function(callback) {
+      window.setTimeout(callback, 1000 / 60);
+    };
+  })();
+
+})();
+</script>
+
+<!--
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44440369-1', 'auto');
+  ga('send', 'pageview', location.pathname);
+</script>
+-->
+
+</body>
+</html>

@@ -1,7 +1,7 @@
 {
   "context": "src",
   "entry": {
-    "humblecropper": [
+    "solidocropper": [
       "./js/index.js",
       "./styles/main.scss"
     ]

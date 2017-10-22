@@ -1,0 +1,12 @@
+const constants = {
+  MOUSE_POINTER_ID: 999,
+  
+  MOUSE_DEVICE: 100,
+  TOUCH_DEVICE: 200,
+
+  TRANSFORM_TRANSLATION: 100,
+  TRANSFORM_ROTATION: 100,
+  TRANSFORM_SCALE: 100,
+}
+
+export default constants;

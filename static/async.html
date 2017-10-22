@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+;(function() {
+
+var async = setTimeout;
+
+function process(i, j, next) {
+  if (i < 16) {
+    if (j < 16) {
+      console.log('process ' + i + ', ' + j);
+      j++;
+      async(function() {
+        process(i, j, next);
+      });
+    }
+    i++;
+  } else {
+    next();
+  }
+}
+
+var t0 = Date.now();
+
+async(function() {
+
+  process(0, 0, function() {
+    var t = Date.now();
+    var dt = (t - t0) / 1000;
+
+    console.log('done in ' + dt.toFixed(3) + '!');
+  });
+
+
+});
+
+})();
+</script>
+</head>
+<body>
+</body>
+</html>

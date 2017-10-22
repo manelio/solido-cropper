@@ -9,7 +9,7 @@ var webpackConfig = require('./webpack.config'),
     config = require('./src/config');
 
 // Internal variables
-var host = 'http://192.168.1.2',
+var host = 'http://localhost',
     port = config.devPort || '3000',
     compiler;
 

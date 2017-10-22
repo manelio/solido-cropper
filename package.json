@@ -1,8 +1,8 @@
 {
-  "name": "humblecropper",
+  "name": "solidocropper",
   "version": "0.1.0",
   "author": "Manel R. Doménech <manel@manel.io>",
-  "homepage": "https://manel.io/humblecropper",
+  "homepage": "https://soli.do/cropper",
   "private": true,
   "licenses": [
     {

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="SolidoCropper Fullscreen Demo.">
+    <meta name="keywords" content="HTML, CSS, JS, JavaScript, image cropping, cropper, solidocropper, solido cropper, canvas, svg, dom, front-end, web development">
+    <meta name="author" content="Manel R. Doménech">
+
+    <link rel="stylesheet" href="../../dist/styles/solidocropper.css" />
+    <link rel="stylesheet" href="demos.css" />
+
+    <style>
+      .a-buttons.out a {
+        /*display: inline-block;*/
+      }
+    </style>
+</head>
+
+<body>
+<div class="example1">
+    <img style="display: none" src="../images/expendables-3-main-castjpg.jpg" />
+</div>
+
+
+<div id="debug-actions" class="devel-info" style="xdisplay: none;">
+    <div class="devel-info-details a-buttons out">
+        <a href="javascript:void(0)" onclick="cropper.targetPoint(604.1016403366394, 402.465424086017, 1.6149840945185416, 0)">Schwarzenegger</a>
+        <a href="javascript:void(0)" onclick="cropper.targetPoint(1400.104497344113, 359.77804761055097, 1.6149840945185416, -0.23)">Stallone</a>
+        <a href="javascript:void(0)" onclick="cropper.targetPoint(850.0439284036579, 339.14405609948733, 2.0611744235647724, 0.020000000000000025)">Lundgren</a>
+    </div>
+</div>
+
+<script src="../../dist/js/solidocropper.js"></script>
+
+<script>
+
+;(function() {
+
+  var image = document.querySelector('.example1 img');
+  window.cropper = new SolidoCropper(image);
+
+})();
+</script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-44440369-1', 'auto');
+  ga('send', 'pageview', location.pathname);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+
+<script>
+
+function internalDecorator(obj){
+    var internal = 0;
+    obj.increment = function(){
+        return ++internal;
+    }
+} 
+
+var A = function(){
+    internalDecorator(this);
+}
+A.prototype = {
+    public: function(){
+        console.log(this.increment());
+    }
+}
+
+var B = function(){
+    internalDecorator(this);
+}
+B.prototype = new A(); // inherits 'public' but ALSO redundant private member code.
+
+var a = new B(); // has it's own private members
+var b = new B(); // has it's own private members
+
+
+a.public();
+a.public();
+
+
+</script>
+</body>
+</html>

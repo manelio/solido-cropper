@@ -1,7 +1,7 @@
-var HumbleCropper = require('./HumbleCropper');
+var SolidoCropper = require('./SolidoCropper');
 
-export default HumbleCropper;
+export default SolidoCropper;
 var isBrowser=new Function("try {return this===window;}catch(e){ return false;}");
 if (isBrowser) {
-  window["HumbleCropper"] = HumbleCropper;
+  window["SolidoCropper"] = SolidoCropper;
 }

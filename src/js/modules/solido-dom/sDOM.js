@@ -32,6 +32,13 @@ export default class SDOM {
     }
   }
 
+  static removeClassName(el, className) {
+    if (this.hasClassName(className)) {
+        let c = el.className;
+        el.className = c.replace(new RegExp("(?:^|\\s+)" + className + "(?:\\s+|$)", "g"), " ");
+    }
+  }
+
   static after(el, el2) {
     el.parentNode.insertBefore(el2, el.nextSibling);
   }
@@ -87,6 +94,68 @@ export default class SDOM {
     }
   }
 
+  static getTransform(el) {
+    let style = window.getComputedStyle(el, null);
+    let transform = 
+      style.getPropertyValue('transform') ||
+      style.getPropertyValue('-webkit-transform') ||
+      style.getPropertyValue('-moz-transform') ||
+      style.getPropertyValue('-ms-transform') ||
+      style.getPropertyValue('-o-transform')
+    ;
+    return transform;
+  }
+
+
+  static getTransformComponents(el, components) {
+    components = components || this.COMPONENT_ALL;
+
+    let transform = this.getTransform(el);
+
+    if (!transform || transform === 'none') {
+      transform = 'matrix(1, 0, 0, 1, 0, 0)';
+    }
+
+    let values = transform.split('(')[1];
+
+    values = values.split(')')[0];
+    values = values.split(/, */);
+
+    let 
+      a = values[0],
+      b = values[1],
+      c = values[2],
+      d = values[3],
+      e = values[4],
+      f = values[5]
+    ;
+
+    let result = {};
+
+    if (components & this.COMPONENT_TRANSLATION) {
+      //console.log('x');
+      result.tx = e;
+      result.ty = f;
+    }
+
+    if (components & this.COMPONENT_ROTATION) {
+      //console.log('y');
+      result.r = Math.atan2(b, a);
+      result.rdeg = result.r * (180/Math.PI);
+    }
+
+    if (components & this.COMPONENT_SCALE) {
+      result.s = Math.sqrt(a*a + b*b);
+    }
+
+    return result;
+  }
+
+  static getTransformString(tx, ty, r, s) {
+    return `translate(${tx}px, ${ty}px) rotate(${r}deg) scale(${s})`;
+  }
+
+
   static requestAnimationFrame(callback) {
     if (_rAF) return _rAF.call(window, callback);
 
@@ -138,4 +207,18 @@ export default class SDOM {
     return _cAF.call(window, callback);
   }
 
+}
+
+SDOM.COMPONENT_ROTATION = 1;
+SDOM.COMPONENT_TRANSLATION = 2;
+SDOM.COMPONENT_SCALE = 4;
+SDOM.COMPONENT_ALL = 7;
+
+var isBrowser = new Function("try {return this === window;}catch(e){ return false;}");
+if (isBrowser) {
+  if (!window.solido) {
+    window.solido = {};
+  }
+  
+  window.solido.dom = SDOM;
 }

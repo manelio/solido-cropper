@@ -1,0 +1,42 @@
+.main-container {
+  max-width: 960px;
+  margin: auto;
+  min-height: 100%;
+  padding: 15px 30px;
+  margin-bottom: 60px;
+}
+
+.ex {
+  text-align: center;
+}
+
+.ex img {
+  width: 100%;
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  margin: auto;
+  font-size: 0;
+}
+
+.__solidocropper-enabled .__solidocropper-debug-info-box {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 15;
+}
+
+.__solidocropper-disabled .__solidocropper-debug-info-box {
+  display: none;
+}
+
+.__solidocropper-container {
+  /*border: 2px solid #ccc;*/
+}
+
+.__solidocropper-container.__solidocropper-enabled {
+  /*border: 2px solid #0f0;*/
+}

@@ -1,0 +1,3 @@
+Think of each pointer (touch or mouse) as like we are controlling a particle with mass M over a surface with a particular coefficient of friction u.
+
+When two pointers acts at same time we will supose there is a spring connecting the two particles. The spring has a constant k and a distance of equilibrium l0. When k = 0, there is no spring. When k = Infinite, two particles works as a rigid body.

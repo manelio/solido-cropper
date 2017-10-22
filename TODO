@@ -1,0 +1,9 @@
+TODO
+
+    - Initialize with a centered image and a control box of same size.
+    - Reset button
+    - Buttons for fitting control box in parent (w, h, full)
+    - Buttons for fitting image in control box (w, h, full)
+    - Rotation and scale external controls
+    - Crop image button
+

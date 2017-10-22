@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            position: relative;
+        }
+
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="example1">
+    <canvas id="canvas1">
+    </canvas>
+    <!-- <img style="display: none" src="big-image.jpg" /> -->
+    <img style="display: none" src="huge-image.jpg" />
+    <!-- <img style="display: none" src="gradient10000.jpg" /> -->
+</div>
+
+<p>Test</p>
+<p>Test</p>
+<p>Test</p>
+<p>Test</p>
+<p>Test</p>
+<p>Test</p>
+<p>Test</p>
+<p>Test</p>
+<p>Test</p>
+<p>Test</p>
+<p>Test</p>
+<p>Test</p>
+<p>Test</p>
+
+
+
+<script src="../dist/js/solidocropper.js"></script>
+
+<script>
+;(function() {
+
+  var image = document.querySelector('.example1 img');
+  var canvas = document.getElementById('canvas1');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  var context = canvas.getContext('2d');
+
+  var callback = function(tile) {
+    //console.log(tile);
+    context.drawImage(tile.source, 0, 0, 256, 256, tile.i * 256, tile.j * 256, 256, 256);
+  }
+
+  window.canvasImagePyramid = new SolidoCropper.CanvasImagePyramid(image, {
+    ready: function(pyramid) {
+        for (var i = 0; i < 3; i++) {
+            for (var j = 0; j < 2; j++) {
+                pyramid.getTile(4, i, j, callback);
+            }
+        }
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>

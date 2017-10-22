@@ -65,7 +65,7 @@ export default class XImage extends RenderableImage {
 
     this.maxZoomLevel = zoomLevel;
 
-    console.log(this.zoomLevelInfo);
+    //console.log(this.zoomLevelInfo);
     
   }
 

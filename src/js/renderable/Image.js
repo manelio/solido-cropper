@@ -6,6 +6,7 @@ export default class ImageObject extends Renderable {
 
   constructor(image) {
     super();
+    this.el = new Image;
     this.ready = false;
     this.code = 'image';
     this._constructor(image);
@@ -17,19 +18,27 @@ export default class ImageObject extends Renderable {
     }
   }
 
-  setImage(image) {
+  setImage(image, useClone) {
     this.ready = false;
 
     if (SDOM.isElement(image)) {
-      this.el = image;
+      if (useClone) {
+        let src = image.src;
+        image = new Image;
+        image.src = src;
+      }
     } else {
-      this.el = new Image;
-      this.el.src = image;
-      image = this.el;
+      let src = image;
+      image = new Image;
+      image.src = src;
     }
 
+    this.el = image;
+
     if (image.complete) {
-      this.onImageLoaded();
+      setTimeout(function() {
+        this.onImageLoaded()
+      }.bind(this), 0);
     }
     else {
       this.eventEmitter.emit('loading', this);
@@ -43,6 +52,12 @@ export default class ImageObject extends Renderable {
 
     this.w = this.originalWidth;
     this.h = this.originalHeight;
+
+    this.el.width = this.w;
+    this.el.height = this.h;
+
+    this.el.style.width = 'auto';
+    this.el.style.height = 'auto';
 
     this.eventEmitter.emit('loaded', this);
     this.eventEmitter.emit('ready', this);

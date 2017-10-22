@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+
+<script>
+
+function _extends(target) {
+    target = Object(target);
+    for (var index = 1; index < arguments.length; index++) {
+      var source = arguments[index];
+      if (source != null) {
+        for (var key in source) {
+          if (Object.prototype.hasOwnProperty.call(source, key)) {
+            target[key] = source[key];
+          }
+        }
+      }
+    }
+}
+
+
+_extends(1, 2, 3);
+
+
+function Emitter() {
+    this.events = [];
+}
+
+Emitter.prototype.add = function(x) {
+    this.events.push(x);
+}
+
+Emitter.prototype.debug = function() {
+    console.log(this.events);
+}
+
+function Person() {
+    if (!(this instanceof Person)) {
+        return new Person();
+    }
+    Emitter.call(this);
+}
+
+_extends(Person.prototype, Emitter.prototype);
+
+var person = Person();
+
+person.add(9);
+person.debug();
+
+/*
+const properties = () => {
+    let self = {
+        list: []
+    }
+
+    Object.assign(self, {
+        add(item) {
+            this.list.push(item);
+        },
+        get() {
+            return this.list;
+        }
+    });
+
+    return self;
+}
+
+const person = (name) => {
+    let self = {
+        name: name
+    };
+
+    Object.assign(self, properties());
+
+    return self;
+};
+
+var me = person('john');
+me.add('wallet');
+var you = person('jane');
+you.add('bag');
+
+console.log(me.get());
+console.log(you.get());
+*/
+
+</script>
+</body>
+</html>

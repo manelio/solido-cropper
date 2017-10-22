@@ -1,0 +1,43 @@
+# Cropper
+
+Viewport
+Image
+Control Box
+
+Each layer has its own transformation matrix
+A layer can be attached to a transformation driver (a object that handles pan, zoom and scale transformations)
+
+There are 'modes'. Behavior of the onPointerStart event depends on mode.
+
+
+Constructor:
+
+    if param is a image, replace image by the viewport
+    if param is a string, it's the image id
+    else, param should be an object
+
+        container
+        image
+
+
+    new Gear()
+    new Layer('image')
+    new Layer('overlay')
+
+    humblecropper.layer();
+    solido.
+
+
+
+Layer contains renderables
+
+
+
+this.layers.add()
+
+
+Renderers
+    Canvas
+    SVG
+    DOMCSS3
+

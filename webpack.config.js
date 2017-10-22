@@ -94,7 +94,7 @@ var addHotMiddleware = function (entry) {
       if (entry[name] instanceof Array !== true) {
         results[name] = [];
         
-        results[name].push('webpack-dev-server/client?http://192.168.1.2:3000');
+        results[name].push('webpack-dev-server/client?http://localhost:3000');
         results[name].push('webpack/hot/only-dev-server');
         results[name].push(entry[name]);
       } else {
@@ -168,13 +168,14 @@ webpackConfig = {
       {
         test: /\.(ttf|eot|svg)(\?.*)?$/,
         loader: 'file?' + qs.stringify({
+          limit: 0,
           name: '[path][name].[ext]'
         })
       },
       {
         test: /\.woff(2)?(\?.*)?$/,
         loader: 'url?' + qs.stringify({
-          limit: 10000,
+          limit: 0,
           mimetype: "application/font-woff",
           name: "[path][name].[ext]"
         })
